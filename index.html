@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Series II: Business Economics Study Portal</title>
+    <style>
+        :root {
+            --primary: #6c5ce7; --secondary: #00cec9; --accent: #ff7675;
+            --bg: #f8f9fa; --card-bg: #ffffff; --text: #2d3436;
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
+        header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; text-align: center; padding: 40px 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .nav-tabs { display: flex; flex-wrap: wrap; justify-content: center; background: white; padding: 15px; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--primary); }
+        .tab-btn { margin: 5px; padding: 10px 18px; border: none; border-radius: 25px; background: #eee; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        .chapter-view { display: none; }
+        .chapter-view.active { display: block; animation: fadeIn 0.4s; }
+        .q-card { background: var(--card-bg); border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 6px solid var(--primary); }
+        .q-meta { color: var(--primary); font-weight: bold; margin-bottom: 10px; font-size: 0.9em; text-transform: uppercase; }
+        .options-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .opt { background: #f1f2f6; padding: 12px; border-radius: 8px; border: 1px solid #dfe6e9; font-size: 0.95em; }
+        .ans-btn { background: var(--secondary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .ans-reveal { display: none; margin-top: 15px; padding: 15px; border-radius: 10px; background: #e3fcef; border: 1px solid #00b894; font-weight: bold; }
+        .logic { margin-top: 10px; font-weight: normal; font-style: italic; color: #636e72; font-size: 0.9em; border-top: 1px dashed #00b894; padding-top: 10px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Business Economics: Series II Master</h1>
+    <p>Complete 100 Questions & Solutions (April 2026 Mock Test)</p>
+</header>
+
+<div class="nav-tabs" id="tabs"></div>
+
+<div class="container" id="content"></div>
+
+<script>
+    // Data mapping from Source 1 (Answers) and Source 2-39 (Questions)
+    const questions = [
+        { id: 1, ch: "Nature of Eco", q: "Which aspect of taxation involves normative economics?", a: "(a) incidence", b: "(b) effect on incentives", c: "(c) 'fairness' of the tax", d: "(d) all the above", ans: "C", log: "Fairness is a value judgment, making it normative [1]." },
+        { id: 2, ch: "Public Finance", q: "What are functions of Government in economy?", a: "(a) Allocation", b: "(b) Redistribution", c: "(c) Stabilization", d: "(d) All of the above", ans: "D", log: "Governments handle allocation, redistribution, and stabilization [1]." },
+        { id: 3, ch: "Money & Banking", q: "The effect of increase CRR will be reduced if:", a: "(a) Bank rate is reduced", b: "(b) Securities are sold", c: "(c) SLR is increased", d: "(d) People don't borrow", ans: "A", log: "Lowering the bank rate increases liquidity, offsetting the CRR hike [2]." },
+        { id: 4, ch: "Demand/Supply", q: "Point elasticity is useful for:", a: "(a) Doubling prices", b: "(b) 50% price cut", c: "(c) Small change (e.g. ₹100 for a car)", d: "(d) None", ans: "C", log: "Point elasticity measures response to infinitesimally small price changes [2, 3]." },
+        { id: 5, ch: "Demand/Supply", q: "Which explains a shift to the right of the supply curve?", a: "(a) Tax imposition", b: "(b) New supplier entering", c: "(c) Rise in wages", d: "(d) Rise in price", ans: "B", log: "More suppliers increase total market supply at every price [3]." },
+        { id: 6, ch: "Nature of Eco", q: "Which is an economic activity?", a: "(a) Listening to music", b: "(b) Teaching own son", c: "(c) Medical facilities by charitable dispensary", d: "(d) Housewife duties", ans: "C", log: "Charitable services for the public involve resource allocation for service [3]." },
+        { id: 7, ch: "Public Finance", q: "The FRBM Act, 2003 emphasises on:", a: "(a) Revenue-led consolidation", b: "(b) Better expenditure", c: "(c) Rational tax regime", d: "(d) All of the above", ans: "D", log: "FRBM targets fiscal responsibility through these pillars [4]." },
+        { id: 8, ch: "Business Cycles", q: "Stagflation is:", a: "(a) Falling prices", b: "(b) Low growth + price increase", c: "(c) High growth + price increase", d: "(d) Cost-push only", ans: "B", log: "Stagflation combines stagnant growth with inflation [4]." },
+        { id: 9, ch: "Nature of Eco", q: "The Law of Scarcity:", a: "(a) No rich countries", b: "(b) No poor countries", c: "(c) Socialist only", d: "(d) Wants never completely satisfied", ans: "D", log: "Human wants are infinite while resources are limited [5]." },
+        { id: 10, ch: "Public Finance", q: "Which is NOT part of Fiscal Policy?", a: "(a) PDS Subsidy", b: "(b) Population Control", c: "(c) Taxation", d: "(d) Govt Bonds", ans: "B", log: "Population control is a demographic policy, not a fiscal tool [5]." },
+        { id: 11, ch: "Markets", q: "Administered Prices refer to:", a: "(a) Market forces", b: "(b) Sellers", c: "(c) External authority (Govt)", d: "(d) None", ans: "C", log: "Prices set by a central authority rather than the market [5, 6]." },
+        { id: 12, ch: "Demand/Supply", q: "Qty of mutton increases 5% when price of chicken increases 20%. Cross elasticity is:", a: "(a) -0.25", b: "(b) 0.25", c: "(c) -4", d: "(d) 4", ans: "B", log: "Logic: 5% / 20% = 0.25 [6]." },
+        { id: 13, ch: "Public Finance", q: "Non-Plan Expenditure includes: 1.Defense 2.Interest 3.Salaries 4.Subsidies", a: "(a) 1 only", b: "(b) 2 & 3 only", c: "(c) 1, 2, 3 and 4", d: "(d) None", ans: "C", log: "All four categories are standard Non-Plan expenditures [6, 7]." },
+        { id: 14, ch: "Indian Economy", q: "To get full demographic dividend, India should:", a: "(a) Skill development", b: "(b) Social security", c: "(c) Reduce mortality", d: "(d) Privatize education", ans: "A", log: "Empowering the workforce with skills is key to demographic gain [7]." },
+        { id: 15, ch: "Public Finance", q: "If interest rate is decreased, it will:", a: "(a) Decrease consumption", b: "(b) Increase tax", c: "(c) Increase investment", d: "(d) Increase savings", ans: "C", log: "Lower interest rates reduce the cost of borrowing for capital [7]." },
+        { id: 16, ch: "Nature of Eco", q: "Communist Manifesto year:", a: "(a) 1848", b: "(b) 1905", c: "(c) 1952", d: "(d) None", ans: "A", log: "Published by Marx and Engels in 1848 [8]." },
+        { id: 17, ch: "Markets", q: "Price discrimination is profitable if elasticities are:", a: "(a) Uniform", b: "(b) Different", c: "(c) Less", d: "(d) Zero", ans: "B", log: "Differences in Ed allow charging different prices [8]." },
+        { id: 18, ch: "Demand/Supply", q: "Giffen good demand curve:", a: "(a) Horizontal", b: "(b) Downward", c: "(c) Upward-sloping to right", d: "(d) Vertical", ans: "C", log: "Giffen goods defy the law of demand [8]." },
+        { id: 19, ch: "Markets", q: "Firms cooperate on price/output in:", a: "(a) Pure Oligopoly", b: "(b) Non-Collusive", c: "(c) Imperfect", d: "(d) Collusive Oligopoly", ans: "D", log: "Collusion involves mutual cooperation [8, 9]." },
+        { id: 20, ch: "Markets", q: "Market selling homogeneous AND differentiated goods:", a: "(a) Oligopoly", b: "(b) Perfect Comp", c: "(c) Monopoly", d: "(d) None", ans: "A", log: "Oligopolies can be pure (homogeneous) or differentiated [9]." },
+        { id: 21, ch: "Public Finance", q: "Meeting deficit via which measure increases money supply?", a: "(a) Disinvestment", b: "(b) World Bank Loan", c: "(c) Deficit Financing", d: "(d) All", ans: "C", log: "Printing money/borrowing from central bank expands money base [9]." },
+        { id: 22, ch: "Demand/Supply", q: "Income elasticity > 1 means commodity is:", a: "(a) Necessity", b: "(b) Luxury", c: "(c) Inferior", d: "(d) Unrelated", ans: "B", log: "Luxury demand rises more than proportionately to income [10]." },
+        { id: 23, ch: "Production/Cost", q: "Isoquants are:", a: "(a) Negatively sloped", b: "(b) Convex", c: "(c) Cannot cross", d: "(d) All of the above", ans: "D", log: "Standard properties of production indifference curves [10]." },
+        { id: 24, ch: "Production/Cost", q: "MC curve reaches minimum before AVC/AC and intersects at their lowest points:", a: "(a) Always", b: "(b) Never", c: "(c) Often", d: "(d) Sometimes", ans: "A", log: "Mathematical relationship between marginal and average cost [10]." },
+        { id: 25, ch: "Markets", q: "At shut-down point:", a: "(a) P=AVC", b: "(b) TR=TVC", c: "(c) Loss = TFC", d: "(d) All of the above", ans: "D", log: "When price only covers variable costs, the firm loses its total fixed cost [11]." },
+        { id: 26, ch: "Markets", q: "If monopolist incurs short-run losses, in the long-run:", a: "(a) Exit", b: "(b) Stay", c: "(c) Break even", d: "(d) Any is possible", ans: "D", log: "Long run outcomes depend on demand shifts and cost structures [11]." },
+        { id: 27, ch: "Markets", q: "In Chamberlin and Kinked models, oligopolists:", a: "(a) Interdependence", b: "(b) No collusion", c: "(c) Constant prices", d: "(d) All of the above", ans: "D", log: "These models focus on non-collusive strategic behaviors [11]." },
+        { id: 28, ch: "Production/Cost", q: "Opportunity cost is:", a: "(a) Unavoidable", b: "(b) Past cost", c: "(c) What we forgo", d: "(d) Additional benefit", ans: "C", log: "The value of the next best alternative given up [12]." },
+        { id: 29, ch: "Demand/Supply", q: "Substitute cross elasticity is:", a: "(a) Positive", b: "(b) Negative", c: "(c) Zero", d: "(d) Always < 1", ans: "A", log: "Direct relationship between price of A and demand for B [12]." },
+        { id: 30, ch: "Production/Cost", q: "Law of diminishing returns to scale is relevant to:", a: "(a) Short period", b: "(b) Long period", c: "(c) Market period", d: "(d) None", ans: "B", log: "Returns to scale involve changing all inputs (Long Run) [13]." },
+        { id: 31, ch: "Demand/Supply", q: "If Price of A doubles, budget line:", a: "(a) Parallel shift", b: "(b) Outward rotation", c: "(c) Inward rotation towards A-axis", d: "(d) No change", ans: "C", log: "Purchasing power for Good A decreases [13]." },
+        { id: 32, ch: "Demand/Supply", q: "Effect of Price A doubling on consumer:", a: "(a) Higher IC", b: "(b) Lower IC", c: "(c) Same IC", d: "(d) Consume more A", ans: "B", log: "Real income falls, reducing satisfaction [14]." },
+        { id: 33, ch: "Demand/Supply", q: "Backward bending supply of labour reason:", a: "(a) Low productivity", b: "(b) Leisure over income preference", c: "(c) Wage decrease", d: "(d) Unions", ans: "B", log: "Income effect outweighs substitution effect at high wages [14]." },
+        { id: 34, ch: "Public Finance", q: "Vertical equity in fiscal federalism is:", a: "(a) Individual equity", b: "(b) Regional equity", c: "(c) Centre-State sharing", d: "(d) GST allocation", ans: "C", log: "Distribution of revenue between different layers of government [15]." },
+        { id: 35, ch: "Markets", q: "Time element conceived by:", a: "(a) Alfred Marshall", b: "(b) Pigou", c: "(c) Allen", d: "(d) None", ans: "A", log: "Marshall introduced market/short/long run time periods [15]." },
+        { id: 36, ch: "Business Cycles", q: "Optimism/Pessimism theory author:", a: "(a) Pigou", b: "(b) Keynes", c: "(c) Hawtrey", d: "(d) None", ans: "A", log: "Psychological theory of business cycles [15]." },
+        { id: 37, ch: "Nature of Eco", q: "Normative taxation aspect:", a: "(a) Incidence", b: "(b) Fairness", c: "(c) Incentive", d: "(d) All", ans: "B", log: "Fairness is subjective/prescriptive [15, 16]." },
+        { id: 38, ch: "Markets", q: "Full Capacity utilized in:", a: "(a) Perfect Competition", b: "(b) Monopoly", c: "(c) Oligopoly", d: "(d) None", ans: "A", log: "Long run equilibrium occurs at minimum AC [16]." },
+        { id: 39, ch: "Markets", q: "Difference between AR and MR in monopoly due to:", a: "(a) Constant price", b: "(b) Price elasticity", c: "(c) Same price at all outputs", d: "(d) Multiple sellers", ans: "B", log: "Monopolist must lower price to sell more [16]." },
+        { id: 40, ch: "Business Cycles", q: "Why do cycle duration/intensity vary?", a: "(a) Contagion", b: "(b) Periodicity/variability", c: "(c) Uniform causes", d: "(d) Constant amplitude", ans: "B", log: "Cycles are rhythmic but not identical in length/depth [17]." },
+        { id: 41, ch: "Business Cycles", q: "Factor for strategic product launch:", a: "(a) Inflation", b: "(b) Phase of cycle", c: "(c) Fixed costs", d: "(d) Monopolistic competition", ans: "B", log: "Launch during expansion is usually most profitable [17]." },
+        { id: 42, ch: "Indian Economy", q: "Immediate cause for 1991 reforms:", a: "(a) Trade surplus", b: "(b) BoP crisis", c: "(c) Political change", d: "(d) Agriculture boom", ans: "B", log: "Forex reserves fell to dangerously low levels [17]." },
+        { id: 43, ch: "Indian Economy", q: "Pre vs Post independence difference:", a: "(a) Population drop", b: "(b) Service to Agri shift", c: "(c) Colonial to Planned development", d: "(d) No private sector", ans: "C", log: "Shift from extraction to domestic welfare planning [17]." },
+        { id: 44, ch: "Intl Trade", q: "Exporting abundant factor goods theory:", a: "(a) Absolute Advantage", b: "(b) Comparative Cost", c: "(c) Factor Proportions", d: "(d) Opportunity Cost", ans: "C", log: "Heckscher-Ohlin Theory [18]." },
+        { id: 45, ch: "Intl Trade", q: "Mercantilist limitation:", a: "(a) Balance of trade focus", b: "(b) Comparative cost", c: "(c) Capital flows", d: "(d) Factor proportions", ans: "A", log: "Focused on hoarding bullion rather than global welfare [18]." },
+        { id: 46, ch: "Intl Trade", q: "Doha Development Round aim:", a: "(a) Liberalize developed only", b: "(b) Developing country concerns", c: "(c) Eliminate services", d: "(d) Restrict investment", ans: "B", log: "Aims to help poorer nations benefit from global trade [18, 19]." },
+        { id: 47, ch: "Money & Banking", q: "Central bank policy influence factor:", a: "(a) Currency-deposit ratio", b: "(b) Reserve ratio", c: "(c) Income level", d: "(d) Price level", ans: "B", log: "RR is a direct tool of the Central Bank [19]." },
+        { id: 48, ch: "Money & Banking", q: "Liquidity trap occurs when money demand is:", a: "(a) Perfectly inelastic", b: "(b) Perfectly elastic", c: "(c) High interest", d: "(d) Zero supply", ans: "B", log: "People hold cash expecting interest rates can't fall further [19]." },
+        { id: 49, ch: "Money & Banking", q: "Reserve ratio 0.2 means multiplier is:", a: "(a) 2", b: "(b) 5", c: "(c) 20", d: "(d) 0.2", ans: "B", log: "1 / 0.2 = 5 [19]." },
+        { id: 50, ch: "Public Finance", q: "Correct negative externalities via:", a: "(a) Subsidies", b: "(b) Price ceilings", c: "(c) Pigouvian taxes", d: "(d) Import quotas", ans: "C", log: "Tax equals the marginal external cost [19, 20]." },
+        { id: 51, ch: "Public Finance", q: "Subsidies and taxes represent:", a: "(a) Deregulation", b: "(b) Monetary policy", c: "(c) Trade policy", d: "(d) Market correction", ans: "D", log: "Fixing market failures [20]." },
+        { id: 52, ch: "Public Finance", q: "Free-rider problem associated with:", a: "(a) Private goods", b: "(b) Public goods", c: "(c) Merit goods", d: "(d) Demerit goods", ans: "B", log: "Non-excludability leads to free-riding [20]." },
+        { id: 53, ch: "Production/Cost", q: "Cost never zero even at zero production:", a: "(a) Supplementary", b: "(b) Prime", c: "(c) Explicit", d: "(d) Implicit", ans: "B", log: "Answer key indicates Prime (though normally Fixed/Supplementary) [20, 21]." },
+        { id: 54, ch: "Production/Cost", q: "AC and MC relationship truth:", a: "(a) MC > AC, AC falls", b: "(b) AC intersects MC at min MC", c: "(c) MC intersects AC at min AC", d: "(d) MC < AC, ATC rises", ans: "C", log: "Basic AC/MC geometry [21]." },
+        { id: 55, ch: "Production/Cost", q: "Cost function is a ______ concept:", a: "(a) Economical", b: "(b) Functional", c: "(c) Financial", d: "(d) Technical", ans: "B", log: "Relates cost to output functional relationship [21]." },
+        { id: 56, ch: "Markets", q: "Monopolistic competition theory (USA) by:", a: "(a) Schumpeter", b: "(b) Robinson", c: "(c) Chamberlin", d: "(d) Clark", ans: "C", log: "Edward Chamberlin formulated this theory in 1933 [21, 22]." },
+        { id: 57, ch: "Nature of Eco", q: "Unlimited ends + limited means = problem of:", a: "(a) Choice", b: "(b) Distribution", c: "(c) Scarcity", d: "(d) None", ans: "A", log: "Scarcity forces a choice between alternatives [22]." },
+        { id: 58, ch: "Demand/Supply", q: "Vertical supply curve parallel to Y axis means Es is:", a: "(a) Infinity", b: "(b) Zero", c: "(c) 1", d: "(d) None", ans: "B", log: "Perfectly inelastic supply [22]." },
+        { id: 59, ch: "Production/Cost", q: "External economy of scale in Long Run:", a: "(a) Risk bearing", b: "(b) Financial", c: "(c) Skilled labour development", d: "(d) All", ans: "C", log: "Shared industry benefits [22, 23]." },
+        { id: 60, ch: "Markets", q: "Monopoly + Monopsony = ", a: "(a) Duopoly", b: "(b) Bilateral Monopoly", c: "(c) Monopolistic", d: "(d) None", ans: "B", log: "Single buyer and single seller [23]." },
+        { id: 61, ch: "National Income", q: "Nominal GDP if Real = 450, Index = 120:", a: "(a) 450", b: "(b) 540", c: "(c) 240", d: "(d) None", ans: "B", log: "450 * 1.2 = 540 [23]." },
+        { id: 62, ch: "National Income", q: "Mixed Income of self-employed:", a: "(a) Net profits", b: "(b) Non-economic wages", c: "(c) Combined factor payments", d: "(d) None", ans: "C", log: "Unincorporated income [23]." },
+        { id: 63, ch: "Public Finance", q: "Economic responsibilities (Centre/State) divider:", a: "(a) NITI Aayog", b: "(b) Finance Commission", c: "(c) Central bank", d: "(d) None", ans: "B", log: "Constitutional body for fiscal federalism [24]." },
+        { id: 64, ch: "Money & Banking", q: "RBI short term credit to bridge State cash mismatches:", a: "(a) Ways and Means Advance", b: "(b) Commercial credit", c: "(c) Facility", d: "(d) None", ans: "A", log: "WMA is the specific tool for this [24]." },
+        { id: 65, ch: "Public Finance", q: "Fiscal deficit relates to:", a: "(a) Tax shortfall", b: "(b) Disinvestment", c: "(c) Borrowings", d: "(d) None", ans: "C", log: "Reflects total govt borrowing requirement [24]." },
+        { id: 66, ch: "Money & Banking", q: "Cambridge equation: value of money depends on:", a: "(a) Demand for money", b: "(b) Supply", c: "(c) Demand for goods", d: "(d) All", ans: "A", log: "Emphasis on demand for cash balances [25]." },
+        { id: 67, ch: "Money & Banking", q: "High-powered money is also:", a: "(a) Base", b: "(b) Reserve", c: "(c) Narrow", d: "(d) All", ans: "D", log: "Includes all monetary base components [25]." },
+        { id: 68, ch: "Money & Banking", q: "Equation of exchange constants in QTM:", a: "(a) V and T", b: "(b) M and V", c: "(c) M and P", d: "(d) V and P", ans: "A", log: "Fisher assumed Velocity and Volume of trade as constant [25]." },
+        { id: 69, ch: "Money & Banking", q: "NOT a function of Central Bank:", a: "(a) Note issue", b: "(b) Banker's bank", c: "(c) Credit creation", d: "(d) Lender of last resort", ans: "C", log: "Commercial banks create credit; RBI controls it [26]." },
+        { id: 70, ch: "Money & Banking", q: "Inflationary gap caused by:", a: "(a) Excess supply", b: "(b) Excess demand", c: "(c) Demand deficiency", d: "(d) Supply deficiency", ans: "B", log: "Demand exceeds potential output [26]." },
+        { id: 71, ch: "Intl Trade", q: "Theory considering bullion as trade essence:", a: "(a) Modern", b: "(b) Factor equalization", c: "(c) Comparative cost", d: "(d) Mercantilism", ans: "D", log: "Pre-classical theory focused on gold/silver [26]." },
+        { id: 72, ch: "Intl Trade", q: "Forex/Currencies in India governed by:", a: "(a) RBI", b: "(b) Banking Act", c: "(c) FEMA Act", d: "(d) SEBI Act", ans: "C", log: "Foreign Exchange Management Act [27]." },
+        { id: 73, ch: "Intl Trade", q: "Promotes development friendly integration of LDCs:", a: "(a) UNCTAD", b: "(b) IBRD", c: "(c) IMF", d: "(d) IDA", ans: "A", log: "UN Conference on Trade and Development [27]." },
+        { id: 74, ch: "Intl Trade", q: "Quantitative restrictions curb:", a: "(a) Imports", b: "(b) Exports", c: "(c) Both", d: "(d) None", ans: "C", log: "Physical limits on volume [27]." },
+        { id: 75, ch: "Indian Economy", q: "NEP industrial reforms included:", a: "(a) Abolition of licensing", b: "(b) De-reservation", c: "(c) Public sector contraction", d: "(d) All", ans: "D", log: "Liberalization of industry [28]." },
+        { id: 76, ch: "Indian Economy", q: "Assertion: NITI Aayog is a think-tank. Reason: Planning Commission was top-down.", a: "(a) Both True + R is explanation", b: "(b) Both True but R not explanation", c: "(c) Both False", d: "(d) A False R True", ans: "A", log: "NITI was created to promote cooperative federalism [29]." },
+        { id: 77, ch: "National Income", q: "Keynesian analysis is:", a: "(a) Short-run", b: "(b) Long-run", c: "(c) Both", d: "(d) Neither", ans: "A", log: "Focused on equilibrium in the short run [30]." },
+        { id: 78, ch: "National Income", q: "GDP Deflator function:", a: "(a) Evaluates inflation (present basket)", b: "(b) Shows real growth", c: "(c) CPI vs Real", d: "(d) None", ans: "A", log: "Measures price changes of all produced goods [30]." },
+        { id: 79, ch: "Intl Trade", q: "Agreement on Agriculture (AOA) doesn't consider:", a: "(a) Direct payments permitted", b: "(b) Indirect assistance not permitted", c: "(c) Domestic policies cut", d: "(d) LDCs no cuts", ans: "B", log: "Certain supports are allowed under boxes [30]." },
+        { id: 80, ch: "Intl Trade", q: "If US exchange rate rises, foreign goods become _____ and US imports _____:", a: "(a) Expensive; Decrease", b: "(b) Less; Decrease", c: "(c) Expensive; Increase", d: "(d) Less; Increase", ans: "D", log: "Stronger currency makes imports cheaper [31]." },
+        { id: 81, ch: "Public Finance", q: "Education is a:", a: "(a) Public good", b: "(b) Merit good", c: "(c) Social good", d: "(d) Club good", ans: "B", log: "Goods that benefit society beyond the individual [31]." },
+        { id: 82, ch: "Public Finance", q: "NOT a criterion for tax distribution (2021-26):", a: "(a) Demographic", b: "(b) Tax/Fiscal efforts", c: "(c) Infrastructure performance", d: "(d) None", ans: "C", log: "Infrastructure is not a primary weight [31]." },
+        { id: 83, ch: "Demand/Supply", q: "Increase in MPC will:", a: "(a) Steepen consumption function", b: "(b) Shift function up", c: "(c) Shift function down", d: "(d) Shift savings up", ans: "A", log: "Slope of consumption curve is MPC [32]." },
+        { id: 84, ch: "Business Cycles", q: "Recession is decline in:", a: "(a) Unemployment", b: "(b) Real GDP (6+ months)", c: "(c) Potential GDP", d: "(d) Inflation", ans: "B", log: "Two consecutive quarters of negative growth [32]." },
+        { id: 85, ch: "Markets", q: "Most likely monopolistically competitive:", a: "(a) Automobile", b: "(b) Steel", c: "(c) Car repair", d: "(d) Electrical", ans: "C", log: "Many small firms with slight differentiation [32]." },
+        { id: 86, ch: "Intl Trade", q: "Countervailing duty criteria:", a: "(a) Export subsidy", b: "(b) Domestic over imported", c: "(c) Limited persons", d: "(d) All", ans: "D", log: "Criteria to offset foreign subsidies [33]." },
+        { id: 87, ch: "Intl Trade", q: "Global Depository Receipt:", a: "(a) Multilat bank receipt", b: "(b) Stock exchange receipt", c: "(c) Overseas bank receipt for domestic shares", d: "(d) FPI receipt", ans: "C", log: "Financial instrument for foreign investment [33]." },
+        { id: 88, ch: "Markets", q: "Stable price in oligopoly model:", a: "(a) Price leadership", b: "(b) Cartel", c: "(c) Prisoners' dilemma", d: "(d) Kinked demand curve", ans: "D", log: "Explains price rigidity [34]." },
+        { id: 89, ch: "Money & Banking", q: "Money Supply is directly proportional to:", a: "(a) CRR", b: "(b) Monetary Base (H)", c: "(c) CDR", d: "(d) Multiplier (m)", ans: "D", log: "M = m * H [34]." },
+        { id: 90, ch: "Public Finance", q: "Redemption of public debt:", a: "(a) Repayment", b: "(b) FDI Repayment", c: "(c) Borrowing", d: "(d) Deficit financing", ans: "A", log: "Paying back the principal [35]." },
+        { id: 91, ch: "Public Finance", q: "Pump Priming relates to:", a: "(a) Monetary", b: "(b) Income", c: "(c) Price", d: "(d) Fiscal Policy", ans: "D", log: "Govt spending to stimulate private investment [35]." },
+        { id: 92, ch: "Public Finance", q: "Fiscal Federalism is:", a: "(a) Political power sharing", b: "(b) Implementing plans", c: "(c) Resource/function division", d: "(d) None", ans: "C", log: "Economic relationship between Govt layers [35]." },
+        { id: 93, ch: "Markets", q: "Third degree price discrimination example:", a: "(a) Dumping", b: "(b) Domestic/Comm use prices", c: "(c) Senior citizen rates", d: "(d) All", ans: "D", log: "Dividing markets into groups [36]." },
+        { id: 94, ch: "Intl Trade", q: "Classical trade theory assumption:", a: "(a) Increasing cost", b: "(b) Imperfect comp", c: "(c) Constant opportunity cost", d: "(d) Govt intervention", ans: "C", log: "Standard Ricardian assumption [36]." },
+        { id: 95, ch: "Intl Trade", q: "GATT aim:", a: "(a) Protectionism", b: "(b) Reduce tariffs", c: "(c) Exchange rates", d: "(d) FDI control", ans: "B", log: "Precursor to WTO [36, 37]." },
+        { id: 96, ch: "Intl Trade", q: "Modes of FDI:", a: "(a) Export quotas", b: "(b) JV/Merger/Greenfield", c: "(c) Tariffs", d: "(d) Exchange control", ans: "B", log: "Ways for direct foreign participation [37]." },
+        { id: 97, ch: "Money & Banking", q: "Policy tool affecting bank lending capacity:", a: "(a) CRR", b: "(b) Repo", c: "(c) SLR", d: "(d) All", ans: "D", log: "All influence bank reserves [37]." },
+        { id: 98, ch: "Public Finance", q: "Primary deficit equals:", a: "(a) Fiscal - Interest", b: "(b) Fiscal + Interest", c: "(c) Revenue - Interest", d: "(d) Capital", ans: "A", log: "Deficit excluding interest on past debt [37]." },
+        { id: 99, ch: "Public Finance", q: "Free-rider problem associatd with:", a: "(a) Private", b: "(b) Public", c: "(c) Merit", d: "(d) Demerit", ans: "B", log: "Public goods are non-excludable [37]." },
+        { id: 100, ch: "Public Finance", q: "Increase spending + Cut taxes to fight recession:", a: "(a) Contractionary", b: "(b) Expansionary", c: "(c) Neutral", d: "(d) Regulatory", ans: "B", log: "Boosts aggregate demand [38]." }
+    ];
+
+    const chapters = [...new Set(questions.map(q => q.ch))];
+
+    function init() {
+        const tabs = document.getElementById('tabs');
+        const content = document.getElementById('content');
+
+        // Create Chapter Tabs
+        chapters.forEach((ch, idx) => {
+            const btn = document.createElement('button');
+            btn.className = `tab-btn ${idx === 0 ? 'active' : ''}`;
+            btn.innerText = ch;
+            btn.onclick = () => showChapter(ch, btn);
+            tabs.appendChild(btn);
+
+            // Create Section
+            const sect = document.createElement('div');
+            sect.id = `ch-${ch.replace(/\s+/g, '')}`;
+            sect.className = `chapter-view ${idx === 0 ? 'active' : ''}`;
+            
+            questions.filter(q => q.ch === ch).forEach(q => {
+                const card = document.createElement('div');
+                card.className = 'q-card';
+                card.innerHTML = `
+                    <div class="q-meta">Question ${q.id}</div>
+                    <div style="font-weight:600; margin-bottom:10px;">${q.q}</div>
+                    <div class="options-box">
+                        <div class="opt">${q.a}</div><div class="opt">${q.b}</div>
+                        <div class="opt">${q.c}</div><div class="opt">${q.d}</div>
+                    </div>
+                    <button class="ans-btn" onclick="toggleAns(this)">Show Solution</button>
+                    <div class="ans-reveal">
+                        Correct Answer: ${q.ans}
+                        <div class="logic"><strong>Why?</strong> ${q.log}</div>
+                    </div>
+                `;
+                sect.appendChild(card);
+            });
+            content.appendChild(sect);
+        });
+    }
+
+    function showChapter(ch, btn) {
+        document.querySelectorAll('.chapter-view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`ch-${ch.replace(/\s+/g, '')}`).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    function toggleAns(btn) {
+        const reveal = btn.nextElementSibling;
+        const isHidden = reveal.style.display === 'none' || reveal.style.display === '';
+        reveal.style.display = isHidden ? 'block' : 'none';
+        btn.innerText = isHidden ? 'Hide Solution' : 'Show Solution';
+    }
+
+    init();
+</script>
+
+</body>
+</html>
